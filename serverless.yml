@@ -1,0 +1,41 @@
+service: nextjs-lambda-app
+
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-east-1
+  stage: ${opt:stage, 'dev'}
+  memorySize: 1024
+  timeout: 30
+  httpApi:
+    payload: '2.0'
+  environment:
+    NODE_ENV: production
+
+functions:
+  nextjs:
+    handler: lambda.handler
+    events:
+      - httpApi:
+          path: /
+          method: ANY
+      - httpApi:
+          path: /{proxy+}
+          method: ANY
+
+plugins:
+  - serverless-offline
+
+package:
+  individually: false
+  patterns:
+    - '!node_modules/**'
+    - '!.next/cache/**'
+    - '.next/**'
+    - 'public/**'
+    - 'lambda.js'
+    - 'node_modules/next/**'
+
+
